@@ -6,11 +6,7 @@ import React from 'react'
 function Greeting({initialName = ''}) {
   // 🐨 initialize the state to the value from localStorage
   // 💰 window.localStorage.getItem('name') || initialName
-  const [name, setName] = React.useState(initialName)
-
-  // 🐨 Here's where you'll use `React.useEffect`.
-  // The callback should set the `name` in localStorage.
-  // 💰 window.localStorage.setItem('name', name)
+  const [name, setName] = useLocalStorageState('name')
 
   function handleChange(event) {
     setName(event.target.value)
@@ -31,3 +27,25 @@ function App() {
 }
 
 export default App
+
+// Extra Credit
+// 1. 💯 lazy state initialization
+// 2. 💯 effect dependencies
+// 3. 💯 custom hook
+// 4. 💯 flexible localStorage hook
+
+const useLocalStorageState = (key, initialValue = '') => {
+  const [state, setState] = React.useState(() => {
+    let localStorageState = window.localStorage.getItem(key)
+    if (localStorageState) {
+      localStorageState = JSON.parse(window.localStorage.getItem(key))
+    }
+    return localStorageState || initialValue
+  })
+
+  React.useEffect(() => {
+    window.localStorage.setItem(key, JSON.stringify(state))
+  }, [key, state])
+
+  return [state, setState]
+}
